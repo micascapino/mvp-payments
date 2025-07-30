@@ -9,8 +9,8 @@ import { JwtStrategy } from '../../strategies/jwt.strategy';
 import { ClientAuth } from '../../entities/clients';
 import { Account } from '../../entities/accounts';
 import jwtConfig from '../../config/jwt.config';
-import { CreateClientController } from './createClient/create-client.controller';
-import { CreateClientUseCase } from './createClient/create-client.use-case';
+import { RegisterClientController } from './registerClient/register-client.controller';
+import { RegisterClientUseCase } from './registerClient/register-client.use-case';
 
 @Module({
   imports: [
@@ -28,11 +28,14 @@ import { CreateClientUseCase } from './createClient/create-client.use-case';
       inject: [ConfigService],
     }),
   ],
-  controllers: [ValidateTokenController, CreateClientController],
+  controllers: [
+    ValidateTokenController,
+    RegisterClientController
+  ],
   providers: [
     AuthService,
     JwtStrategy,
-    CreateClientUseCase
+    RegisterClientUseCase
   ],
   exports: [AuthService],
 })

@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
+import { ClientAuth } from './clients';
 
 @Entity('accounts')
 export class Account {
@@ -14,8 +15,12 @@ export class Account {
     @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
     balance: number;
 
-    @Column({ type: 'varchar', length: 3, default: 'USD' })
-    currency: string;
+    @Column({ name: 'client_id', nullable: true })
+    clientId: string;
+
+    @OneToOne(() => ClientAuth, { nullable: true })
+    @JoinColumn({ name: 'client_id', referencedColumnName: 'clientId' })
+    client: ClientAuth;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
