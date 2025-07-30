@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionStatus } from "src/models/transaction.model";
+import { TransactionStatus } from "src/entities/transactions";
 import { TransactionRepository } from "src/repositories/transaction.repository";
 import { TransactionStatusError } from "src/shared/errors/transaction.errors";
 
@@ -13,7 +13,7 @@ export class RejectTransactionUseCase {
     if (transaction.status !== TransactionStatus.PENDING) {
       throw new TransactionStatusError(
         transactionId,
-        transaction.status,
+        transaction.status as TransactionStatus,
         TransactionStatus.PENDING
       );
     }

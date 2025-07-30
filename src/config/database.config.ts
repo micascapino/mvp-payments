@@ -1,11 +1,9 @@
 import { registerAs } from '@nestjs/config';
 
-export interface DatabaseConfig {
-  supabaseUrl: string;
-  supabaseKey: string;
-}
-
-export default registerAs<DatabaseConfig>('database', () => ({
-  supabaseUrl: process.env.SUPABASE_URL || '',
-  supabaseKey: process.env.SUPABASE_ANON_KEY || '',
+export default registerAs('database', () => ({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 5432,
+  database: process.env.DB_NAME || 'mvp_payments',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
 })); 

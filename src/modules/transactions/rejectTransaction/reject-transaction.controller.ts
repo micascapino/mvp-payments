@@ -1,14 +1,19 @@
-import { Controller, HttpStatus, Param, Patch, HttpException } from "@nestjs/common";
+import { Controller, HttpStatus, Param, Patch, HttpException, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { RejectTransactionUseCase } from "./reject-transaction.use-case";
 import { Transaction } from "src/models/transaction.model";
 import { TransactionStatusError } from "src/shared/errors/transaction.errors";
+import { JwtAuthGuard } from "src/guards/jwt-auth.guard";
+import { RolesGuard } from "src/guards/roles.guard";
+import { Roles } from "src/decorators/roles.decorator";
 
 @ApiTags('transactions')
 @Controller('transactions')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RejectTransactionController {
     constructor(private readonly rejectTransactionUseCase: RejectTransactionUseCase) { }
 
+    @Roles('admin')
     @Patch(':transactionId/reject')
     @ApiOperation({ summary: 'Reject a pending transaction' })
     @ApiResponse({

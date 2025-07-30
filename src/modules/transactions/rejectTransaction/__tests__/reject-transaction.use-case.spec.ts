@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionRepository } from '../../../../repositories/transaction.repository';
-import { TransactionStatus } from '../../../../models/transaction.model';
+import { Transaction, TransactionStatus } from '../../../../entities/transactions';
 import { TransactionStatusError } from '../../../../shared/errors/transaction.errors';
 import { RejectTransactionUseCase } from '../reject-transaction.use-case';
 
@@ -33,13 +33,14 @@ describe('RejectTransactionUseCase', () => {
   describe('execute', () => {
     it('should throw TransactionStatusError when trying to reject a non-pending transaction', async () => {
       const transactionId = '123';
-      const completedTransaction = {
+      const completedTransaction: Transaction = {
         id: transactionId,
-        origin_user_id: '1',
-        destiny_user_id: '2',
+        originAccountId: '1',
+        destinyAccountId: '2',
         amount: 1000,
         status: TransactionStatus.COMPLETED,
-        created_at: new Date()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       transactionRepository.getTransactionById.mockResolvedValue(completedTransaction);

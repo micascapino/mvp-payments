@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionStatus } from "../../../models/transaction.model";
+import { TransactionStatus } from "../../../entities/transactions";
 import { TransactionRepository } from "../../../repositories/transaction.repository";
-import { TransactionStatusError, TransactionNotFoundError } from "../../../shared/errors/transaction.errors";
+import { TransactionStatusError } from "../../../shared/errors/transaction.errors";
 
 @Injectable()
 export class ApproveTransactionUseCase {
@@ -20,8 +20,8 @@ export class ApproveTransactionUseCase {
 
     try {
       await this.transactionRepository.transferMoney(
-        transaction.origin_user_id,
-        transaction.destiny_user_id,
+        transaction.originAccountId,
+        transaction.destinyAccountId,
         transaction.amount,
         transaction.id
       );

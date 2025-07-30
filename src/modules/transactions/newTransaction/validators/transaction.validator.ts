@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../../../../repositories/user.repository';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import { AccountRepository } from 'src/repositories/account.repository';
 
 @Injectable()
 export class TransactionValidator {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly accountRepository: AccountRepository) {}
 
   async validateTransaction(transaction: CreateTransactionDto): Promise<void> {
     await this.validateOriginUser(transaction);
@@ -12,7 +12,7 @@ export class TransactionValidator {
   }
 
   private async validateOriginUser(transaction: CreateTransactionDto): Promise<void> {
-    const originUser = await this.userRepository.getUserById(transaction.originUserId);
+    const originUser = await this.accountRepository.getAccountById(transaction.originAccountId);
     
     if (!originUser) {
       throw new Error('Origin user not found');
@@ -24,7 +24,7 @@ export class TransactionValidator {
   }
 
   private async validateDestinyUser(transaction: CreateTransactionDto): Promise<void> {
-    const destinyUser = await this.userRepository.getUserById(transaction.destinyUserId);
+    const destinyUser = await this.accountRepository.getAccountById(transaction.destinyAccountId);
     
     if (!destinyUser) {
       throw new Error('Destiny user not found');

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Transaction, TransactionStatus } from '../../../models/transaction.model';
+import { Transaction } from '../../../entities/transactions';
+import { TransactionStatus } from '../../../entities/transactions';
 import { TransactionRepository } from '../../../repositories/transaction.repository';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionValidator } from './validators/transaction.validator';
@@ -27,8 +28,8 @@ export class CreateTransactionUseCase {
 
       try {
         await this.transactionRepository.transferMoney(
-          transaction.originUserId,
-          transaction.destinyUserId,
+          transaction.originAccountId,
+          transaction.destinyAccountId,
           transaction.amount,
           createTransaction.id
         );

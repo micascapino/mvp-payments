@@ -1,133 +1,128 @@
 import { Injectable } from '@nestjs/common';
-import { SupabaseService } from '../services/supabase.service';
-import { Transaction, TransactionStatus } from '../models/transaction.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { CreateTransactionDto } from '../modules/transactions/newTransaction/dto/create-transaction.dto';
+import { Account } from '../entities/accounts';
+import { Transaction } from '../entities/transactions';
+import { TransactionStatus } from '../entities/transactions';
 
 @Injectable()
 export class TransactionRepository {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    @InjectRepository(Transaction)
+    private transactionRepository: Repository<Transaction>,
+    private dataSource: DataSource
+  ) { }
 
   async createTransaction(transaction: CreateTransactionDto): Promise<Transaction> {
-    const supabase = this.supabaseService.getClient();
-    
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert({
-        origin_user_id: transaction.originUserId,
-        destiny_user_id: transaction.destinyUserId,
-        amount: transaction.amount,
-        status: TransactionStatus.PENDING,
-      })
-      .select()
-      .single();
+    const newTransaction = new Transaction();
+    newTransaction.originAccountId = transaction.originAccountId;
+    newTransaction.destinyAccountId = transaction.destinyAccountId;
+    newTransaction.amount = transaction.amount;
+    newTransaction.status = TransactionStatus.PENDING;
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
+    return await this.transactionRepository.save(newTransaction);
   }
 
   async updateTransactionStatus(id: string, status: TransactionStatus): Promise<Transaction> {
-    const supabase = this.supabaseService.getClient();
-    
-    const { data, error } = await supabase
-      .from('transactions')
-      .update({ status })
-      .eq('id', id)
-      .select()
-      .single();
+    const transaction = await this.transactionRepository.findOne({ where: { id } });
 
-    if (error) {
-      throw new Error(error.message);
+    if (!transaction) {
+      throw new Error('Transacción no encontrada');
     }
 
-    return data;
+    transaction.status = status;
+    return await this.transactionRepository.save(transaction);
   }
 
   async transferMoney(
-    originUserId: number,
-    destinyUserId: number,
+    originAccountId: string,
+    destinyAccountId: string,
     amount: number,
     transactionId: string
   ): Promise<void> {
-    const supabase = this.supabaseService.getClient();    
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      const { data: originUser } = await supabase
-        .from('users')
-        .select('balance')
-        .eq('id', originUserId)
-        .single();
+      const originAccount = await queryRunner.manager
+        .createQueryBuilder(Account, 'account')
+        .setLock('pessimistic_write')
+        .where('account.id = :id', { id: originAccountId })
+        .getOne();
 
-      if (originUser.balance < amount) throw new Error('Insufficient funds in origin account');
+      if (!originAccount) {
+        throw new Error('Origin account not found');
+      }
 
-      const { data: destinyUser } = await supabase
-        .from('users')
-        .select('balance')
-        .eq('id', destinyUserId)
-        .single();
+      if (originAccount.balance < amount) {
+        throw new Error('Insufficient funds in origin account');
+      }
 
-      const { error: debitError } = await supabase
-        .from('users')
-        .update({ balance: originUser.balance - amount })
-        .eq('id', originUserId);
+      const destinyAccount = await queryRunner.manager
+        .createQueryBuilder(Account, 'account')
+        .setLock('pessimistic_write')
+        .where('account.id = :id', { id: destinyAccountId })
+        .getOne();
 
-      if (debitError) throw debitError;
+      if (!destinyAccount) {
+        throw new Error('Destiny account not found');
+      }
 
-      const { error: creditError } = await supabase
-        .from('users')
-        .update({ balance: destinyUser.balance + amount })
-        .eq('id', destinyUserId);
+      originAccount.balance -= amount;
+      destinyAccount.balance += amount;
 
-      if (creditError) throw creditError;
+      await queryRunner.manager.save(Account, originAccount);
+      await queryRunner.manager.save(Account, destinyAccount);
 
-      const { error: updateError } = await supabase
-        .from('transactions')
-        .update({ status: TransactionStatus.COMPLETED })
-        .eq('id', transactionId);
+      const transaction = await queryRunner.manager
+        .createQueryBuilder(Transaction, 'transaction')
+        .setLock('pessimistic_write')
+        .where('transaction.id = :id', { id: transactionId })
+        .getOne();
 
-      if (updateError) throw updateError;
+      if (transaction) {
+        transaction.status = TransactionStatus.COMPLETED;
+        await queryRunner.manager.save(Transaction, transaction);
+      }
 
+      await queryRunner.commitTransaction();
     } catch (error) {
-      await supabase
-        .from('transactions')
-        .update({ status: TransactionStatus.FAILED })
-        .eq('origin_user_id', originUserId)
-        .eq('destiny_user_id', destinyUserId)
-        .eq('amount', amount)
-        .eq('status', TransactionStatus.PENDING);
+      await queryRunner.rollbackTransaction();
+
+      const transaction = await this.transactionRepository.findOne({ where: { id: transactionId } });
+      if (transaction) {
+        transaction.status = TransactionStatus.FAILED;
+        await this.transactionRepository.save(transaction);
+      }
 
       throw new Error(`Transfer failed: ${error.message}`);
+    } finally {
+      await queryRunner.release();
     }
   }
 
   async getTransactionsByUser(userId: string) {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .or(`origin_user_id.eq.${userId},destiny_user_id.eq.${userId}`)
-      .order('created_at');
-
-    if (error) {
-      throw new Error(`Failed to get transactions: ${error.message}`);
-    }
-
-    return data;
+    return await this.transactionRepository.find({
+      where: [
+        { originAccountId: userId },
+        { destinyAccountId: userId }
+      ],
+      order: { createdAt: 'ASC' }
+    });
   }
 
   async getTransactionById(transactionId: string) {
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('id', transactionId)
-      .single();
+    const transaction = await this.transactionRepository.findOne({
+      where: { id: transactionId }
+    });
 
-    if (error) {
-      throw new Error(`Failed to get transaction: ${error.message}`);
+    if (!transaction) {
+      throw new Error('Transacción no encontrada');
     }
 
-    return data;
+    return transaction;
   }
 } 

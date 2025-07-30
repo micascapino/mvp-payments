@@ -1,15 +1,21 @@
-import { Controller, HttpException, HttpStatus, Param, Patch } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, HttpException, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Transaction } from '../../../models/transaction.model';
 import { ApproveTransactionUseCase } from './approve-transaction.use-case';
 import { TransactionStatusError } from '../../../shared/errors/transaction.errors';
+import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
+import { RolesGuard } from '../../../guards/roles.guard';
+import { Roles } from '../../../decorators/roles.decorator';
 
 @ApiTags('transactions')
 @Controller('transactions')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class ApproveTransactionController {
     constructor(private readonly approveTransactionUseCase: ApproveTransactionUseCase) { }
 
     @Patch(':transactionId/approve')
+    @Roles('admin')
     @ApiOperation({ summary: 'Approve a pending transaction' })
     @ApiResponse({
         status: 200,
@@ -19,6 +25,14 @@ export class ApproveTransactionController {
     @ApiResponse({
         status: 400,
         description: 'Transaction cannot be approved - Not in pending status'
+    })
+    @ApiResponse({
+        status: 401,
+        description: 'Unauthorized - Invalid or missing token'
+    })
+    @ApiResponse({
+        status: 403,
+        description: 'Forbidden - Insufficient permissions'
     })
     async approveTransaction(
         @Param('transactionId') transactionId: string

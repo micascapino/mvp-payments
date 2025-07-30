@@ -1,11 +1,15 @@
-import { Body, Controller, Post, HttpException, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Post, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Transaction } from '../../../models/transaction.model';
 import { CreateTransactionUseCase } from './create-transaction.use-case';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
+import { TransactionOwnerGuard } from '../../../guards/transaction-owner.guard';
 
 @ApiTags('transactions')
 @Controller('transactions')
+@UseGuards(JwtAuthGuard, TransactionOwnerGuard)
+@ApiBearerAuth()
 export class TransactionController {
   constructor(private readonly createTransactionUseCase: CreateTransactionUseCase) { }
 
@@ -16,13 +20,21 @@ export class TransactionController {
     description: 'Transaction created successfully',
     type: Transaction
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - Insufficient balance or invalid data' 
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Insufficient balance or invalid data'
   })
-  @ApiResponse({ 
-    status: 422, 
-    description: 'Transaction requires validation - Amount exceeds threshold' 
+  @ApiResponse({
+    status: 422,
+    description: 'Transaction requires validation - Amount exceeds threshold'
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token'
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions or not account owner'
   })
   async createTransaction(
     @Body() transaction: CreateTransactionDto
