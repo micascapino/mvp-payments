@@ -7,13 +7,16 @@ import { ValidateTokenController } from './validateToken/validate-token-controll
 import { AuthService } from '../../services/auth.service';
 import { JwtStrategy } from '../../strategies/jwt.strategy';
 import { ClientAuth } from '../../entities/clients';
+import { Account } from '../../entities/accounts';
 import jwtConfig from '../../config/jwt.config';
+import { CreateClientController } from './createClient/create-client.controller';
+import { CreateClientUseCase } from './createClient/create-client.use-case';
 
 @Module({
   imports: [
     PassportModule,
     ConfigModule.forFeature(jwtConfig),
-    TypeOrmModule.forFeature([ClientAuth]),
+    TypeOrmModule.forFeature([ClientAuth, Account]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -25,10 +28,11 @@ import jwtConfig from '../../config/jwt.config';
       inject: [ConfigService],
     }),
   ],
-  controllers: [ValidateTokenController],
+  controllers: [ValidateTokenController, CreateClientController],
   providers: [
     AuthService,
     JwtStrategy,
+    CreateClientUseCase
   ],
   exports: [AuthService],
 })
