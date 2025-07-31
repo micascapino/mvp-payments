@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ClientAuth } from '../core/entities/clients';
 import * as bcrypt from 'bcrypt';
-import { ClientAuth } from "src/core/entities";
 
 export interface JwtPayload {
     clientId: string;
@@ -49,7 +49,7 @@ export class AuthService {
         try {
             return this.jwtService.verify(token) as JwtPayload;
         } catch (error) {
-            throw new Error('Token inválido');
+            throw new Error('Invalid token');
         }
     }
 }

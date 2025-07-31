@@ -24,24 +24,25 @@ export class CreateAccountUseCase {
         throw new Error('Email already in use');
       }
 
-      const existingClient = await this.clientRepository.findOne({
-        where: { email: accountData.email }
-      });
-
-      if (!existingClient) {
-        console.log(`No se encontró un cliente con el email ${accountData.email}. La cuenta se creará sin vincular a un cliente.`);
-      } else {
-        console.log(`Cliente encontrado: ${existingClient.clientId}. Vinculando cuenta...`);
-      }
-
-      const account = this.accountRepository.create({
+      const newAccount = this.accountRepository.create({
         name: accountData.name,
         email: accountData.email,
         balance: accountData.balance,
-        clientId: existingClient?.clientId || null
       });
 
-      return await this.accountRepository.save(account);
+      if (accountData.email) {
+        const existingClient = await this.clientRepository.findOne({
+          where: { email: accountData.email }
+        });
+
+        if (!existingClient) {
+          console.log(`No client found with email ${accountData.email}. Account will be created without linking to a client.`);
+        } else {
+          newAccount.clientId = existingClient.clientId;
+        }
+      }
+
+      return await this.accountRepository.save(newAccount);
     } catch (error) {
       throw new Error(`Failed to create account: ${error.message}`);
     }

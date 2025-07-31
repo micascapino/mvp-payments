@@ -49,7 +49,7 @@ export class AuthService {
         try {
             return this.jwtService.verify(token) as JwtPayload;
         } catch (error) {
-            throw new Error('Token inválido');
+            throw new Error('Invalid token');
         }
     }
 }

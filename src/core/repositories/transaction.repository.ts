@@ -27,7 +27,7 @@ export class TransactionRepository {
     const transaction = await this.transactionRepository.findOne({ where: { id } });
 
     if (!transaction) {
-      throw new Error('Transacción no encontrada');
+      throw new Error('Transaction not found');
     }
 
     transaction.status = status;
