@@ -103,14 +103,38 @@ export class TransactionRepository {
     }
   }
 
-  async getTransactionsByUser(userId: string) {
-    return await this.transactionRepository.find({
-      where: [
-        { originAccountId: userId },
-        { destinyAccountId: userId }
-      ],
-      order: { createdAt: 'ASC' }
-    });
+  async getTransactionsByUser(userId: string, filters?: {
+    status?: string,
+    destinyAccountId?: string,
+    startDate?: Date,
+    endDate?: Date
+  }) {
+    const queryBuilder = this.transactionRepository.createQueryBuilder('transaction')
+      .where('(transaction.originAccountId = :userId OR transaction.destinyAccountId = :userId)',
+        { userId });
+
+    if (filters?.status) {
+      queryBuilder.andWhere('transaction.status = :status', { status: filters.status });
+    }
+
+    if (filters?.destinyAccountId) {
+      queryBuilder.andWhere('transaction.destinyAccountId = :destinyId',
+        { destinyId: filters.destinyAccountId });
+    }
+
+    if (filters?.startDate) {
+      queryBuilder.andWhere('transaction.createdAt >= :startDate',
+        { startDate: filters.startDate });
+    }
+
+    if (filters?.endDate) {
+      queryBuilder.andWhere('transaction.createdAt <= :endDate',
+        { endDate: filters.endDate });
+    }
+
+    queryBuilder.orderBy('transaction.createdAt', 'ASC');
+
+    return await queryBuilder.getMany();
   }
 
   async getTransactionById(transactionId: string) {
@@ -119,7 +143,7 @@ export class TransactionRepository {
     });
 
     if (!transaction) {
-      throw new Error('Transacción no encontrada');
+      throw new Error('Transaction not found');
     }
 
     return transaction;
