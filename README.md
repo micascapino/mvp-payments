@@ -5,12 +5,16 @@ Este proyecto es una API REST construida con NestJS para la gestión de transfer
 ## 🚀 Tecnologías Utilizadas
 
 - **NestJS**: Framework Node.js para construir aplicaciones del lado del servidor
+- **TypeORM**: ORM para la gestión de base de datos
+- **PostgreSQL**: Base de datos relacional
+- **JWT**: JSON Web Tokens para autenticación
 - **Swagger**: Documentación de la API
 
 ## 📋 Prerrequisitos
 
 - Node.js
 - npm o yarn
+- PostgreSQL
 
 ## 🔧 Instalación
 
@@ -30,13 +34,13 @@ Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
 ```env
 DATABASE_URL=
 PORT=3000
+JWT_SECRET=your-secret-key
 ```
 Los valores de dichas variables fueron compartidas por HackerRank
 
 4. Iniciar el servidor:
 ```bash
 npm run start
-
 ```
 
 ## 📚 Documentación de la API
@@ -48,36 +52,47 @@ http://localhost:3000/api
 
 ### Endpoints Principales
 
-#### Transacciones
-- `POST /auth/token`: Autenticacion
-- `POST /accounts`: Creacion de cuentas (solo disponible para admin)
+#### Autenticación
+- `POST /auth/register`: Registrar un nuevo cliente
+- `POST /auth/token`: Autenticación y obtención de token JWT
+
+#### Cuentas
+- `POST /accounts`: Creación de cuentas (solo disponible para admin)
 - `GET /accounts/me`: Obtener datos de mi cuenta
+
+#### Transacciones
 - `GET /transactions/me`: Obtener transacciones de mi usuario
 - `POST /transactions`: Crear una nueva transacción
 
-## 🧪 Testing
-
-Para ejecutar los tests:
-```bash
-npm run test
-
-```
 ## 📦 Estructura del Proyecto
 
 ```
 src/
+├── app.module.ts
+├── core/
+│   ├── config/
+│   ├── entities/
+│   ├── repositories/
+│   └── security/
+│       ├── decorators/
+│       ├── guards/
+│       └── strategies/
+├── database/
+│   └── migrations/
 ├── modules/
-│   └── accounts/
-│       ├── createAccount/
-│       └── getMyAccount/
+│   ├── accounts/
+│   │   ├── getMyAccount/
+│   │   └── newAccount/
+│   ├── auth/
+│   │   ├── registerClient/
+│   │   └── validateToken/
 │   └── transactions/
-│       ├── createTransaction/
-│       ├── getTransactionsByUser/
-│       ├── approveTransaction/
-│       └── rejectTransaction/
-├── models/
+│       ├── getMyTransactions/
+│       └── newTransaction/
+├── services/
 ├── shared/
-│   └── errors/
-
+│   ├── errors/
+│   ├── models/
+│   └── services/
 └── main.ts
 ```
