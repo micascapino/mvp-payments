@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from '../../config/typeorm.config';
-import { Transaction } from '../../entities/transactions';
-import { ClientAuth } from '../../entities/clients';
-import { Account } from '../../entities/accounts';
+import { typeOrmConfig } from '../core/config/typeorm.config';
+import { Transaction } from '../core/entities/transactions';
+import { ClientAuth } from '../core/entities/clients';
+import { Account } from '../core/entities/accounts';
 
 @Module({
   imports: [

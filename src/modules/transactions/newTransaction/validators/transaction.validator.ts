@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
-import { AccountRepository } from 'src/repositories/account.repository';
+import { AccountRepository } from '../../../../core/repositories/account.repository';
 
 @Injectable()
 export class TransactionValidator {

@@ -1,10 +1,10 @@
 import { Body, Controller, Post, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { Transaction } from '../../../models/transaction.model';
+import { Transaction } from '../../../core/entities/transactions';
 import { CreateTransactionUseCase } from './create-transaction.use-case';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
-import { TransactionOwnerGuard } from '../../../guards/transaction-owner.guard';
+import { JwtAuthGuard } from '../../../core/security/guards/jwt-auth.guard';
+import { TransactionOwnerGuard } from '../../../core/security/guards/transaction-owner.guard';
 
 @ApiTags('transactions')
 @Controller('transactions')

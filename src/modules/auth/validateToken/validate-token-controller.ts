@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UnauthorizedException, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { AuthService } from "src/services/auth.service";
+import { AuthService } from "src/shared/services/auth.service";
 import { TokenResponseDto } from "./dtos/token-response-dto";
 import { TokenRequestDto } from "./dtos/token-request-dto";
 

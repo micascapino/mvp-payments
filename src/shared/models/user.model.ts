@@ -12,4 +12,4 @@ export class User {
 
   @ApiProperty({ description: 'The current balance of the user' })
   balance: number;
-} 
+}

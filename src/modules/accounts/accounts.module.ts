@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewAccountController } from './newAccount/new-account-controller';
 import { CreateAccountUseCase } from './newAccount/new-account-use-case';
-import { GetMyAccountController } from './myAccount/get-my-account-controller';
-import { GetMyAccountUseCase } from './myAccount/get-my-account-use-case';
-import { Account } from '../../entities/accounts';
-import { ClientAuth } from '../../entities/clients';
+import { GetMyAccountController } from './getMyAccount/get-my-account-controller';
+import { GetMyAccountUseCase } from './getMyAccount/get-my-account-use-case';
+import { Account } from '../../core/entities/accounts';
+import { ClientAuth } from '../../core/entities/clients';
 
 @Module({
   imports: [

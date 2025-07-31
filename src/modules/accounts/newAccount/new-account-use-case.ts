@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Account } from '../../../entities/accounts';
-import { ClientAuth } from '../../../entities/clients';
+import { Account } from '../../../core/entities/accounts';
+import { ClientAuth } from '../../../core/entities/clients';
 import { CreateAccountDto } from './dto/create-account.dto';
 
 @Injectable()

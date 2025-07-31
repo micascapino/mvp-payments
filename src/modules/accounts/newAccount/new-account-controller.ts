@@ -1,11 +1,11 @@
 import { Body, Controller, Post, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { Account } from '../../../entities/accounts';
+import { Account } from '../../../core/entities/accounts';
 import { CreateAccountUseCase } from './new-account-use-case';
 import { CreateAccountDto } from './dto/create-account.dto';
-import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
-import { RolesGuard } from '../../../guards/roles.guard';
-import { Roles } from '../../../decorators/roles.decorator';
+import { JwtAuthGuard } from '../../../core/security/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../core/security/guards/roles.guard';
+import { Roles } from '../../../core/security/decorators/roles.decorator';
 
 @ApiTags('accounts')
 @Controller('accounts')

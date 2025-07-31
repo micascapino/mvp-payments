@@ -4,11 +4,11 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ValidateTokenController } from './validateToken/validate-token-controller';
-import { AuthService } from '../../services/auth.service';
-import { JwtStrategy } from '../../strategies/jwt.strategy';
-import { ClientAuth } from '../../entities/clients';
-import { Account } from '../../entities/accounts';
-import jwtConfig from '../../config/jwt.config';
+import { AuthService } from '../../shared/services/auth.service';
+import { JwtStrategy } from '../../core/security/strategies/jwt.strategy';
+import { ClientAuth } from '../../core/entities/clients';
+import { Account } from '../../core/entities/accounts';
+import jwtConfig from '../../core/config/jwt.config';
 import { RegisterClientController } from './registerClient/register-client.controller';
 import { RegisterClientUseCase } from './registerClient/register-client.use-case';
 

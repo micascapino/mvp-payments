@@ -2,13 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ClientAuth } from '../../core/entities/clients';
 import * as bcrypt from 'bcrypt';
-import { ClientAuth } from "src/core/entities";
 
 export interface JwtPayload {
-    clientId: string;
-    role: string;
-    sub: string;
+  clientId: string;
+  role: string;
+  sub: string;
 }
 
 @Injectable()
@@ -20,11 +20,11 @@ export class AuthService {
     ) { }
 
     async validateClient(clientId: string, secret: string): Promise<string | null> {
-        const client = await this.clientRepository.findOne({
-            where: {
+        const client = await this.clientRepository.findOne({ 
+            where: { 
                 clientId,
-                isActive: true
-            }
+                isActive: true 
+            } 
         });
 
         if (!client) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Transaction } from '../../../entities/transactions';
-import { TransactionStatus } from '../../../entities/transactions';
-import { TransactionRepository } from '../../../repositories/transaction.repository';
+import { Transaction } from '../../../core/entities/transactions';
+import { TransactionStatus } from '../../../core/entities/transactions';
+import { TransactionRepository } from '../../../core/repositories/transaction.repository';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionValidator } from './validators/transaction.validator';
 

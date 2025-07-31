@@ -1,8 +1,8 @@
 import { Controller, Get, HttpException, HttpStatus, UseGuards, Request } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { Account } from '../../../entities/accounts';
+import { Account } from '../../../core/entities/accounts';
 import { GetMyAccountUseCase } from './get-my-account-use-case';
-import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../core/security/guards/jwt-auth.guard';
 
 @ApiTags('accounts')
 @Controller('accounts')

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { CreateTransactionDto } from '../modules/transactions/newTransaction/dto/create-transaction.dto';
+import { CreateTransactionDto } from '../../modules/transactions/newTransaction/dto/create-transaction.dto';
 import { Account } from '../entities/accounts';
 import { Transaction, TransactionStatus } from '../entities/transactions';
 

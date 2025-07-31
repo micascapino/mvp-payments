@@ -1,4 +1,4 @@
-import { TransactionStatus } from '../../entities/transactions';
+import { TransactionStatus } from '../../core/entities/transactions';
 
 export class TransactionError extends Error {
   constructor(message: string) {
