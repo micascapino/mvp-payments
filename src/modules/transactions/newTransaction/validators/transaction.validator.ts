@@ -18,6 +18,10 @@ export class TransactionValidator {
       throw new Error('Origin user not found');
     }
 
+    if (originUser.id === transaction.destinyAccountId) {
+      throw new Error('Origin and destiny accounts cannot be the same');
+    }
+
     if (originUser.balance < transaction.amount) {
       throw new Error('Insufficient balance');
     }
