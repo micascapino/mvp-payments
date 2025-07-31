@@ -32,15 +32,11 @@ export class TransactionOwnerGuard implements CanActivate {
       relations: ['client']
     });
 
-    const client = await this.clientRepository.findOne({
-      where: { clientId: user.clientId }
-    });
-
-    if (!client || !account) {
+    if (!account) {
       throw new ForbiddenException('Origin account not found');
     }
 
-    if (account.email !== user.email) {
+    if (account.clientId !== user.clientId) {
       throw new ForbiddenException('You can only create transactions from your own accounts');
     }
 

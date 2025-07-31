@@ -26,7 +26,7 @@ export class CreateTransactionUseCase {
         createTransaction.id
       );
 
-      return createTransaction;
+      return await this.transactionRepository.getTransactionById(createTransaction.id);
     } catch (error) {
       throw new Error(`Failed to create transaction: ${error.message}`);
     }

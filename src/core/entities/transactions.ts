@@ -1,10 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Account } from './accounts';
 
 export enum TransactionStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
-  REJECTED = 'REJECTED',
   FAILED = 'FAILED'
 }
 
