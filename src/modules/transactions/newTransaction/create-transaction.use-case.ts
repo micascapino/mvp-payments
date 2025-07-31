@@ -12,39 +12,21 @@ export class CreateTransactionUseCase {
   constructor(
     private readonly transactionRepository: TransactionRepository,
     private readonly transactionValidator: TransactionValidator
-  ) {}
+  ) { }
 
   async execute(transaction: CreateTransactionDto): Promise<Transaction> {
     try {
       await this.transactionValidator.validateTransaction(transaction);
       const createTransaction = await this.transactionRepository.createTransaction(transaction);
 
-      if (transaction.amount > this.HIGH_AMOUNT_THRESHOLD) {
-        return await this.transactionRepository.updateTransactionStatus(
-          createTransaction.id,
-          TransactionStatus.PENDING
-        );
-      }
+      await this.transactionRepository.transferMoney(
+        transaction.originAccountId,
+        transaction.destinyAccountId,
+        transaction.amount,
+        createTransaction.id
+      );
 
-      try {
-        await this.transactionRepository.transferMoney(
-          transaction.originAccountId,
-          transaction.destinyAccountId,
-          transaction.amount,
-          createTransaction.id
-        );
-
-        return await this.transactionRepository.updateTransactionStatus(
-          createTransaction.id,
-          TransactionStatus.COMPLETED
-        );
-      } catch (error) {
-        await this.transactionRepository.updateTransactionStatus(
-          createTransaction.id,
-          TransactionStatus.FAILED
-        );
-        throw error;
-      }
+      return createTransaction;
     } catch (error) {
       throw new Error(`Failed to create transaction: ${error.message}`);
     }

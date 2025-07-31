@@ -52,11 +52,8 @@ http://localhost:3000/api
 - `POST /auth/token`: Autenticacion
 - `POST /accounts`: Creacion de cuentas (solo disponible para admin)
 - `GET /accounts/me`: Obtener datos de mi cuenta
-- `GET /transactions/:accountId`: Obtener transacciones de un usuario (creditos o debitos)
+- `GET /transactions/me`: Obtener transacciones de mi usuario
 - `POST /transactions`: Crear una nueva transacción
-- `PATCH /transactions/:id/reject`: Rechazar una transacción pendiente
-- `PATCH /transactions/:id/approve`: Aprobar una transacción pendiente
-
 
 ## 🧪 Testing
 

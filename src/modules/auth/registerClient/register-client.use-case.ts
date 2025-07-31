@@ -13,7 +13,6 @@ export class RegisterClientUseCase {
   ) {}
 
   async execute(registerData: RegisterClientDto): Promise<{ clientId: string; email: string }> {
-    // Verificar si ya existe un cliente con ese ID o email
     const existingClient = await this.clientRepository.findOne({
       where: [
         { clientId: registerData.clientId },
@@ -28,11 +27,7 @@ export class RegisterClientUseCase {
           : 'Email already in use'
       );
     }
-
-    // Hash del secreto
     const hashedSecret = await bcrypt.hash(registerData.clientSecret, 10);
-
-    // Crear el cliente
     const client = this.clientRepository.create({
       clientId: registerData.clientId,
       hashedSecret,

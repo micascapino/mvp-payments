@@ -17,19 +17,16 @@ export class AccountOwnerGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     
-    // Admin puede acceder a cualquier cuenta
     if (user.role === 'admin') {
       return true;
     }
 
-    // Obtener el ID de cuenta del cuerpo de la solicitud o de los parámetros
     const accountId = request.body.accountId || request.params.accountId;
     
     if (!accountId) {
-      return true; // Si no hay ID de cuenta, no podemos validar
+      return true;
     }
 
-    // Buscar el cliente autenticado para obtener el email asociado
     const client = await this.clientRepository.findOne({
       where: { clientId: user.clientId }
     });
@@ -37,8 +34,6 @@ export class AccountOwnerGuard implements CanActivate {
     if (!client || !client.email) {
       throw new ForbiddenException('Client not associated with any email');
     }
-
-    // Buscar la cuenta y verificar que pertenezca al usuario
     const account = await this.accountRepository.findOne({
       where: { id: accountId }
     });
@@ -47,7 +42,6 @@ export class AccountOwnerGuard implements CanActivate {
       throw new ForbiddenException('Account not found');
     }
 
-    // Verificar que la cuenta pertenezca al usuario
     if (account.email !== client.email) {
       throw new ForbiddenException('You can only access your own accounts');
     }

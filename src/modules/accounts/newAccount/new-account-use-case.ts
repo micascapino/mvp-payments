@@ -16,7 +16,6 @@ export class CreateAccountUseCase {
 
   async execute(accountData: CreateAccountDto): Promise<Account> {
     try {
-      // Verificar que el email no esté en uso
       const existingAccount = await this.accountRepository.findOne({
         where: { email: accountData.email }
       });
@@ -25,7 +24,6 @@ export class CreateAccountUseCase {
         throw new Error('Email already in use');
       }
 
-      // Verificar si ya existe un cliente con este email
       const existingClient = await this.clientRepository.findOne({
         where: { email: accountData.email }
       });
