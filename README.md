@@ -38,6 +38,14 @@ JWT_SECRET=your-secret-key
 ```
 Los valores de dichas variables fueron compartidas por HackerRank
 
+
+4. Correr las migraciones
+
+```bash
+   npm run migration:run
+   npm run db:seed
+```
+
 4. Iniciar el servidor:
 ```bash
 npm run start

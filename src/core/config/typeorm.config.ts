@@ -11,7 +11,7 @@ export const typeOrmConfig: DataSourceOptions = {
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'mvp_payments',
   entities: [Transaction, ClientAuth, Account],
-  synchronize: true,
+  synchronize: false,
 };
 
 export default new DataSource(typeOrmConfig); 
