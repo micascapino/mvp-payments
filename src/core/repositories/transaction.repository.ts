@@ -17,7 +17,7 @@ export class TransactionRepository {
     const newTransaction = new Transaction();
     newTransaction.originAccountId = transaction.originAccountId;
     newTransaction.destinyAccountId = transaction.destinyAccountId;
-    newTransaction.amount = Number(transaction.amount.toFixed(2));
+    newTransaction.amount = transaction.amount;
     newTransaction.status = TransactionStatus.PENDING;
 
     return await this.transactionRepository.save(newTransaction);
@@ -48,10 +48,10 @@ export class TransactionRepository {
     
     const queryRunner = this.dataSource.createQueryRunner();
 
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       const [originAccount, destinyAccount] = await Promise.all([
         queryRunner.manager
           .createQueryBuilder(Account, 'account')
@@ -77,9 +77,8 @@ export class TransactionRepository {
         throw new Error('Insufficient funds in origin account');
       }
 
-      const amountToTransfer = Number(amount.toFixed(2));
-      originAccount.balance = Number((originAccount.balance - amountToTransfer).toFixed(2));
-      destinyAccount.balance = Number((destinyAccount.balance + amountToTransfer).toFixed(2));
+      originAccount.balance -= amount;
+      destinyAccount.balance += amount;
 
       await Promise.all([
         queryRunner.manager.save(Account, originAccount),
@@ -89,13 +88,21 @@ export class TransactionRepository {
 
       await queryRunner.commitTransaction();
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
 
-      await this.updateTransactionStatusInTransaction(queryRunner, transactionId, TransactionStatus.FAILED);
+      try {
+        await this.updateTransactionStatusInTransaction(queryRunner, transactionId, TransactionStatus.FAILED);
+      } catch (updateError) {
+        console.error('Error updating transaction status to FAILED:', updateError);
+      }
 
       throw new Error(`Transfer failed: ${error.message}`);
     } finally {
-      await queryRunner.release();
+      if (queryRunner.isReleased === false) {
+        await queryRunner.release();
+      }
     }
   }
 
@@ -152,7 +159,6 @@ export class TransactionRepository {
   ): Promise<void> {
     const transaction = await queryRunner.manager
       .createQueryBuilder(Transaction, 'transaction')
-      .setLock('pessimistic_write')
       .where('transaction.id = :id', { id: transactionId })
       .getOne();
 

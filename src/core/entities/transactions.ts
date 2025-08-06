@@ -18,7 +18,10 @@ export class Transaction {
     @Column({ name: 'destiny_account_id', type: 'uuid' })
     destinyAccountId: string;
 
-    @Column({ type: 'decimal', precision: 12, scale: 2 })
+    @Column({ type: 'decimal', precision: 12, scale: 2, transformer: {
+        to: (value: number) => value,
+        from: (value: string | number) => Number(value)
+    }})
     amount: number;
 
     @Column({ 
