@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, Min, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, Min, IsUUID, IsPositive } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateTransactionDto {
     @ApiProperty({
@@ -23,7 +24,9 @@ export class CreateTransactionDto {
         example: 100.50,
         minimum: 0.01
     })
-    @IsNumber()
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @IsPositive()
     @Min(0.01)
+    @Transform(({ value }) => parseFloat(value))
     amount: number;
 } 

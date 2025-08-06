@@ -17,7 +17,7 @@ export class TransactionRepository {
     const newTransaction = new Transaction();
     newTransaction.originAccountId = transaction.originAccountId;
     newTransaction.destinyAccountId = transaction.destinyAccountId;
-    newTransaction.amount = transaction.amount;
+    newTransaction.amount = Number(transaction.amount.toFixed(2));
     newTransaction.status = TransactionStatus.PENDING;
 
     return await this.transactionRepository.save(newTransaction);
@@ -77,8 +77,9 @@ export class TransactionRepository {
         throw new Error('Insufficient funds in origin account');
       }
 
-      originAccount.balance -= amount;
-      destinyAccount.balance += amount;
+      const amountToTransfer = Number(amount.toFixed(2));
+      originAccount.balance = Number((originAccount.balance - amountToTransfer).toFixed(2));
+      destinyAccount.balance = Number((destinyAccount.balance + amountToTransfer).toFixed(2));
 
       await Promise.all([
         queryRunner.manager.save(Account, originAccount),
